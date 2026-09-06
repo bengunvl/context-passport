@@ -12,9 +12,16 @@
  * than fetch(), because fetch normalizes the path and would quietly test
  * nothing at all. That is the trap this file is guarding, so it has to be
  * avoided here first.
+ *
+ * It also asserts that a path which does not resolve to a file comes back as
+ * 404 rather than as the index page with a 200. Editors fetch the schema URLs
+ * on their own since SchemaStore/schemastore#6264, and a success status
+ * carrying HTML tells a validator it received a schema, which it then reports
+ * as a fault in the user's own document.
  */
 
 import { spawn } from 'node:child_process';
+import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { connect } from 'node:net';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
@@ -84,11 +91,31 @@ try {
     fail('did not serve / as html');
   }
 
+  // A miss must read as a miss. server.js used to answer every unknown path
+  // with the index page and a 200, which is the worse of the two failures for
+  // a machine: "here is your document" instead of "there is nothing here".
   const unknown = await rawRequest('/no-such-page');
-  if (unknown.startsWith('HTTP/1.1 200') && unknown.includes('text/html')) {
-    pass('unknown path falls back to index.html');
+  if (unknown.startsWith('HTTP/1.1 404')) {
+    pass('unknown path returns 404');
   } else {
-    fail('unknown path did not fall back to index.html');
+    fail('unknown path did not return 404');
+  }
+
+  // The case this file was extended for. SchemaStore points every VS Code,
+  // Visual Studio and JetBrains install at /schema/*.json, so a schema that is
+  // mistyped, renamed or not yet deployed has to come back as absent. If it
+  // comes back as HTML with a 200, the validator reports a parse failure
+  // against the user's own file and nothing points at this server.
+  const missingSchema = await rawRequest('/schema/nonexistent.json');
+  const missingSchemaBody = missingSchema.toLowerCase();
+  if (
+    missingSchema.startsWith('HTTP/1.1 404') &&
+    !missingSchemaBody.includes('text/html') &&
+    !missingSchemaBody.includes('<!doctype')
+  ) {
+    pass('missing schema path returns 404 with no HTML body');
+  } else {
+    fail('missing schema path was not a 404 with a non-HTML body');
   }
 
   // Nothing outside the site root is reachable, however the path is spelled.
@@ -129,15 +156,37 @@ try {
     }
   }
 
-  // The specification's examples reference /.well-known paths, so the rule
-  // above has to be narrower than "reject anything beginning with a dot".
-  // There is no .well-known directory yet; what matters is that the request
-  // reaches the normal miss path rather than being rejected out of hand.
-  const wellKnown = await rawRequest('/.well-known/did.json');
-  if (wellKnown.startsWith('HTTP/1.1 200') && wellKnown.includes('text/html')) {
-    pass('/.well-known is not blanket-denied');
-  } else {
-    fail('/.well-known was denied, which would block a documented path');
+  // The specification's examples reference /.well-known/did.json and
+  // /.well-known/cp-revoked-keys.json, so the deny rule above has to be
+  // narrower than "reject anything beginning with a dot".
+  //
+  // This serves a real file for the length of the check rather than asking
+  // what a missing .well-known path returns. Asking would prove nothing: a
+  // blanket-denied path and an absent one both come back 404, so the
+  // assertion would hold whether or not the rule was too broad. That is also
+  // why the earlier version of this case could not fail. Back when every miss
+  // returned the index page, a denied .well-known and a permitted one both
+  // produced 200 text/html, so it asserted a constant.
+  const wellKnownDir = join(ROOT, '.well-known');
+  const wellKnownFile = join(wellKnownDir, 'did.json');
+  const hadDir = existsSync(wellKnownDir);
+  const hadFile = existsSync(wellKnownFile);
+  try {
+    if (!hadDir) mkdirSync(wellKnownDir);
+    if (!hadFile) writeFileSync(wellKnownFile, '{"id":"did:web:contextpassport.com"}\n');
+
+    const wellKnown = await rawRequest('/.well-known/did.json');
+    const bodyOk = hadFile || wellKnown.includes('did:web:contextpassport.com');
+    if (wellKnown.startsWith('HTTP/1.1 200') && wellKnown.includes('application/json') && bodyOk) {
+      pass('/.well-known is served, not blanket-denied');
+    } else {
+      fail('/.well-known was denied, which would block a documented path');
+    }
+  } finally {
+    // Only remove what this check created, so a real .well-known directory in
+    // someone's checkout survives running the tests.
+    if (!hadFile) rmSync(wellKnownFile, { force: true });
+    if (!hadDir) rmSync(wellKnownDir, { recursive: true, force: true });
   }
 
   // A file that exists in the repo but is not part of the published site is
