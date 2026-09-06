@@ -67,8 +67,11 @@ def pin(passport, *, ctx_id, timestamp):
     passport["id"] = ctx_id
     passport["created_at"] = timestamp
     passport["event"]["timestamp"] = timestamp
-    if passport["integrity"].get("verified_at") is not None:
-        passport["integrity"]["verified_at"] = timestamp
+    # The SDK still emits verification_status and verified_at. The schema no
+    # longer defines either, so strip rather than pin: the examples should show
+    # the shape the specification describes, not the shape one SDK produces.
+    passport["integrity"].pop("verification_status", None)
+    passport["integrity"].pop("verified_at", None)
     return passport
 
 
@@ -108,7 +111,7 @@ error = pin(
     ctx_id="ctx_1774358320000_e1a2b3c4d5e6",
     timestamp="2026-03-29T10:05:00Z",
 )
-write("error.json", error)
+write("error.passport.json", error)
 
 
 # ------------------------------------------------------------------- spawn
@@ -138,7 +141,7 @@ spawn = pin(
     ctx_id="ctx_1774358330000_a1b2c3d4e5f7",
     timestamp="2026-03-29T10:06:00Z",
 )
-write("spawn.json", spawn)
+write("spawn.passport.json", spawn)
 
 
 # ----------------------------------------------------------------- timeout
@@ -165,7 +168,7 @@ timeout = pin(
     ctx_id="ctx_1774358340000_f1e2d3c4b5a6",
     timestamp="2026-03-29T10:07:00Z",
 )
-write("timeout.json", timeout)
+write("timeout.passport.json", timeout)
 
 
 # ------------------------------------------------------------------ branch
@@ -190,7 +193,7 @@ branch = pin(
     ctx_id="ctx_1774358470000_b1a2c3d4e5f8",
     timestamp="2026-03-29T10:32:00Z",
 )
-write("branch.json", branch)
+write("branch.passport.json", branch)
 
 
 # ------------------------------------------------------------------- retry
@@ -218,7 +221,7 @@ retry = pin(
     ctx_id="ctx_1774358355000_c1d2e3f4a5b6",
     timestamp="2026-03-29T10:08:00Z",
 )
-write("retry.json", retry)
+write("retry.passport.json", retry)
 
 
 # ------------------------------------------------------------------- fork
@@ -269,7 +272,7 @@ fork_event = pin(
     timestamp="2026-03-29T10:33:00Z",
 )
 relink(fork_event, fork_checkpoint)
-write("fork.json", [fork_checkpoint, fork_event])
+write("fork.passports.json", [fork_checkpoint, fork_event])
 
 
 # ----------------------------------------------------------------- revert
@@ -312,7 +315,7 @@ revert_event = pin(
     timestamp="2026-03-29T10:34:00Z",
 )
 relink(revert_event, revert_commit)
-write("revert.json", [revert_commit, revert_event])
+write("revert.passports.json", [revert_commit, revert_event])
 
 
 # ------------------------------------------------------------------ merge
@@ -378,6 +381,6 @@ merge_event = pin(
     timestamp="2026-03-29T10:36:00Z",
 )
 relink(merge_event, merge_branch_work)
-write("merge.json", [merge_ancestor, merge_branch_work, merge_event])
+write("merge.passports.json", [merge_ancestor, merge_branch_work, merge_event])
 
 print("\nRun `npm test` to validate these against schema/v2.json.")

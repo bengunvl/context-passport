@@ -35,8 +35,7 @@ The goal: become the standard envelope format for AI agent events — a record a
   "integrity": {
     "payload_hash":        "sha256:e7733904...",
     "parent_hash":         "sha256:f4a2b1c3...",
-    "integrity_hash":      "sha256:8a1c9d22...",
-    "verification_status": "valid"
+    "integrity_hash":      "sha256:8a1c9d22..."
   },
   "created_at": "2026-03-29T10:00:00Z"
 }

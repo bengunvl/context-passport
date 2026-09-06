@@ -69,7 +69,7 @@
     },
     "integrity": {
       "type": "object",
-      "required": ["payload_hash", "integrity_hash", "verification_status"],
+      "required": ["payload_hash", "integrity_hash"],
       "properties": {
         "payload_hash": {
           "type": "string",
@@ -85,12 +85,7 @@
           "type": "string",
           "pattern": "^sha256:[a-f0-9]{64}$",
           "description": "sha256(payload_hash + parent_hash)"
-        },
-        "verification_status": {
-          "type": "string",
-          "enum": ["valid", "broken", "unverified"]
-        },
-        "verified_at": { "type": ["string", "null"], "format": "date-time" }
+        }
       }
     },
     "lineage": {
