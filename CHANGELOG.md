@@ -23,7 +23,27 @@ breaking, which is exactly what happened in 2.0.
 
 ## [Unreleased]
 
-Nothing yet.
+### Removed
+
+- `integrity.verification_status` and `integrity.verified_at`, from
+  `schema/v2.json` and from every example, the README, Appendix A and the
+  witness-log note. Both were written unconditionally by the producer at
+  creation, covered by no hash, and `verification_status` was required, so
+  every record ever produced asserted that it had been verified and found
+  valid when nobody had verified anything. A verdict written into the record
+  it judges is the one shape of field this format exists to make unnecessary.
+  Not breaking under this file's definition: neither field was ever hashed,
+  the integrity block permits additional properties so records still carrying
+  them keep validating, and producers who omit them go from non-conforming to
+  conforming. Verifiers that need to persist a verdict keep it beside the
+  passport, never inside it.
+
+### Fixed
+
+- `tools/generate-developer-examples.py` wrote to the pre-§3.5 filenames
+  (`branch.json` rather than `branch.passport.json`), so running it after the
+  2.0.1 rename produced eight stray files beside the real examples. It now
+  emits the convention names, matching the compliance generator.
 
 ## [2.0.1] - 2026-08-28
 

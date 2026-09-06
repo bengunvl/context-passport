@@ -127,8 +127,7 @@ A Context Passport is a JSON object with the following structure. Fields marked 
   "integrity": {
     "payload_hash":        "sha256:hex",
     "parent_hash":         "sha256:hex | null",
-    "integrity_hash":      "sha256:hex",
-    "verification_status": "valid | broken | unverified"
+    "integrity_hash":      "sha256:hex"
   },
 
   "lineage": {
@@ -198,7 +197,8 @@ The integrity block MUST be computed by the implementation at commit time. Clien
 | `payload_hash` | SHA-256 of the canonicalized payload. See section 3.4. Formatted as `sha256:{hex}`. |
 | `parent_hash` | The `integrity_hash` of the parent commit. Null for root commits. Formatted as `sha256:{hex}` or null. |
 | `integrity_hash` | SHA-256 of the concatenation of `payload_hash` and `parent_hash`. See section 3.4. |
-| `verification_status` | `valid` if the chain is intact to this point. `broken` if a hash mismatch is detected. `unverified` if verification has not been performed. |
+
+The integrity block carries no verdict about itself. Whether a chain is intact is a conclusion the verifier reaches by recomputing these hashes, never a fact the producer records. Earlier drafts included a `verification_status` field here; it was written unconditionally at creation, covered by no hash, and therefore stated nothing a reader could rely on. Verifiers that need to persist a verdict should do so in their own metadata, outside the passport.
 
 #### 3.2.6 Lineage
 
@@ -482,7 +482,6 @@ def make_passport(agent_id, agent_name, payload, parent=None,
             "payload_hash":        pay_hash,
             "parent_hash":         parent_hash,
             "integrity_hash":      int_hash,
-            "verification_status": "valid",
         },
         "lineage": {
             "fork_of":      None,

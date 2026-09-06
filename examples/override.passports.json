@@ -33,8 +33,7 @@
     "integrity": {
       "payload_hash": "sha256:43e955f6b5f542a18de59064a5a90e28496cdfd7f4f3e534344f0a72e22536ac",
       "parent_hash": null,
-      "integrity_hash": "sha256:f732a2d8020bb8649b0fb0764ec7ab1f9af40279562414ff77cb96e83629717e",
-      "verification_status": "valid"
+      "integrity_hash": "sha256:f732a2d8020bb8649b0fb0764ec7ab1f9af40279562414ff77cb96e83629717e"
     },
     "created_at": "2026-03-29T10:01:00Z"
   },
@@ -72,8 +71,7 @@
     "integrity": {
       "payload_hash": "sha256:f12f6d7c3634860aabfec98a63bd567792baa6c54d1f17396fbe9b218089a7f2",
       "parent_hash": "sha256:f732a2d8020bb8649b0fb0764ec7ab1f9af40279562414ff77cb96e83629717e",
-      "integrity_hash": "sha256:e8933c7737e077e9539682e0e8829600425d94ff4ca4e47af5fe461738ecac41",
-      "verification_status": "valid"
+      "integrity_hash": "sha256:e8933c7737e077e9539682e0e8829600425d94ff4ca4e47af5fe461738ecac41"
     },
     "created_at": "2026-03-29T10:02:00Z"
   }

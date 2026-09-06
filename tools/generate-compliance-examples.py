@@ -55,8 +55,11 @@ def pin(passport, *, ctx_id, timestamp):
     passport["id"] = ctx_id
     passport["created_at"] = timestamp
     passport["event"]["timestamp"] = timestamp
-    if passport["integrity"].get("verified_at") is not None:
-        passport["integrity"]["verified_at"] = timestamp
+    # The SDK still emits verification_status and verified_at. The schema no
+    # longer defines either, so strip rather than pin: the examples should show
+    # the shape the specification describes, not the shape one SDK produces.
+    passport["integrity"].pop("verification_status", None)
+    passport["integrity"].pop("verified_at", None)
     return passport
 
 

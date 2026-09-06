@@ -34,8 +34,7 @@
   "integrity": {
     "payload_hash": "sha256:713553eb9558b54ce9ec26de197d00de620ff73bf3499ef1b0b4a874eee24cb8",
     "parent_hash": null,
-    "integrity_hash": "sha256:95cea4ee43f62ee7a614daa091a34751b9b00478cb961e6b4597b602e109d254",
-    "verification_status": "valid"
+    "integrity_hash": "sha256:95cea4ee43f62ee7a614daa091a34751b9b00478cb961e6b4597b602e109d254"
   },
   "created_at": "2026-03-29T10:05:00Z"
 }

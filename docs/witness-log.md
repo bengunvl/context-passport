@@ -43,7 +43,7 @@ A passport progresses through these tiers in order. Different verifiers care abo
 The receiving server accepts passports from clients (per `docs/throughput-and-trust.md` submission patterns), validates them, and stores them. Required validation at this tier:
 
 - **Schema validation:** the incoming passport validates against the schema matching its `schema_version` (`schema/v2.json` for v2.0 records, `schema/v1.json` for v1.x records).
-- **Hash validation:** `integrity.payload_hash` recomputed by the server matches the client-supplied value. If not, the passport is stored but flagged with `verification_status: rejected` and the reason recorded.
+- **Hash validation:** `integrity.payload_hash` recomputed by the server matches the client-supplied value. If not, the passport is stored unmodified but flagged as rejected in the operator's own metadata, with the reason recorded. The flag lives beside the passport, never inside it: the envelope carries no field for a verdict, because a verdict written into the record it judges is worth nothing.
 - **Chain validation:** if `parent_id` is set, the parent passport is fetched and `integrity.parent_hash` is verified to match its `integrity_hash`. Broken chains are flagged but stored.
 - **Signature validation (if present):** the Ed25519 (or other algorithm) signature is verified against the embedded public key. Failures are flagged but stored.
 
