@@ -23,7 +23,13 @@ breaking, which is exactly what happened in 2.0.
 
 ## [Unreleased]
 
-Nothing yet.
+### Fixed
+
+- `package-lock.json` was out of sync with `package.json`, so `npm ci` failed
+  on a clean checkout (#79, fixed in #83). CI never noticed because every job
+  installed by naming packages with `--no-save`, which reads nothing from the
+  lockfile. Both jobs now run `npm ci`, so the lockfile is exercised on every
+  run and the dependency list lives only in `package.json`.
 
 ## [2.0.1] - 2026-08-28
 
