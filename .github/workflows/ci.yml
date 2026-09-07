@@ -25,7 +25,13 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: '20'
-      - run: npm install --no-save ajv ajv-formats canonicalize
+          cache: npm
+      # npm ci, not npm install --no-save with a package list. Naming packages
+      # here meant the lockfile was never read, so it drifted out of sync with
+      # package.json and nothing went red until someone tried npm ci by hand
+      # (#79). It also kept the dependency list in two places. This installs
+      # what package.json declares, and fails if the lockfile disagrees.
+      - run: npm ci
       - run: node tools/validate-examples.mjs
       # server.js serves contextpassport.com. It previously joined the raw
       # request path onto the site root with no containment check, which made
@@ -87,5 +93,9 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: '20'
-      - run: npm install --no-save @contextpassport/core@^2.0.0 tsx
+          cache: npm
+      # See the note in the examples job: npm ci so the lockfile is exercised
+      # rather than bypassed. @contextpassport/core and tsx are both in
+      # devDependencies, so this installs them without naming them again.
+      - run: npm ci
       - run: node tools/check-quickstart-ts.mjs
