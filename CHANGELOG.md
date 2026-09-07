@@ -23,7 +23,19 @@ breaking, which is exactly what happened in 2.0.
 
 ## [Unreleased]
 
-Nothing yet.
+### Changed
+
+- §5.4 no longer claims that records "cannot be modified, reordered, or
+  backdated without detection". Under the 2.0 hash rules that is true of the
+  payload and the chain order and false of everything else: `created_by`,
+  `event`, `trace_id` and `branch_key` are carried by the chain but not bound
+  by it, so an unsigned record can be reattributed, reclassified or backdated
+  and still verify. Tested against both reference SDKs. The section now says
+  what the chain protects, what only a signature protects, and that integrators
+  who care about attribution or timing MUST sign. Both quickstarts gain a
+  section 5 demonstrating the gap, so a reader who has just watched a payload
+  edit break verification also watches an author edit fail to. Binding the
+  envelope into the chain is proposed for 3.0 in #81.
 
 ## [2.0.1] - 2026-08-28
 

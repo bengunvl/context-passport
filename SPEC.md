@@ -348,7 +348,7 @@ The `created_by.agent_id` field is self-reported by the committing agent. It is 
 
 ### 5.4 Completeness vs. integrity
 
-This specification provides guarantees about the **integrity** of records that are created — they cannot be modified, reordered, or backdated without detection. It does not and cannot guarantee **completeness** — that every event the agent should have recorded was in fact recorded. A client who controls record creation can omit records they choose not to create, and no cryptographic system can reveal the omission.
+This specification provides guarantees about the **integrity** of the payload and the chain linkage of records that are created: the payload cannot be modified, and records cannot be reordered, without detection. Under the 2.0 hash rules (§3.4) the envelope fields are carried by the chain but not bound by it. `created_by`, `event`, `trace_id` and `branch_key` can be rewritten on an unsigned record and the chain still verifies; backdating in particular is a change to `event.timestamp` and is not detected by the chain alone. Those fields are bound only when the record is signed (§3.2.7) and the verifier checks the signature. Integrators for whom attribution or timing matters, which includes every compliance use, MUST sign. It does not and cannot guarantee **completeness** — that every event the agent should have recorded was in fact recorded. A client who controls record creation can omit records they choose not to create, and no cryptographic system can reveal the omission.
 
 Implementations and integrators that require completeness guarantees (e.g., regulated audit trails) MUST combine Context Passport with one or more of:
 

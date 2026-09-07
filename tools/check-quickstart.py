@@ -25,7 +25,9 @@ DOC = ROOT / "docs" / "quickstart.md"
 
 # The boolean lines the document tells the reader to expect, in order:
 #   parent_hash linkage, verify, verify after tampering, verify after undo.
-EXPECTED_BOOLS = ["True", "True", "False", "True"]
+#   ...then the author is rewritten and the chain still verifies, which is the
+#   document's honest statement of what the 2.0 chain does not cover.
+EXPECTED_BOOLS = ["True", "True", "False", "True", "True"]
 
 blocks = re.findall(r"```python\n(.*?)```", io.open(DOC, encoding="utf-8").read(), re.S)
 if not blocks:

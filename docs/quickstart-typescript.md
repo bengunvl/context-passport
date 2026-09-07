@@ -96,6 +96,27 @@ Put it back and it verifies again:
 console.log(verifyChain(chain));
 ```
 
+## 5. What the chain does not protect
+
+The chain covers the payload and the link to the parent. It does not cover
+who wrote the record, when, or what kind of event it was. Rewrite the author:
+
+```typescript
+chain[0].created_by.agent_id = "someone-else";
+
+console.log(verifyChain(chain));
+```
+
+`true`. The attribution changed and nothing noticed. The same is true of
+`event.type`, `event.timestamp` and `event.to_agent_id`: under the 2.0 hash
+rules those fields are metadata the chain carries but does not bind.
+
+If who and when matter to you, and for any compliance use they do, sign the
+records. A signature covers the whole envelope, so a forged author fails
+`verifySignature` even though it passes `verifyChain`. Signing is covered in
+[`docs/key-management.md`](key-management.md). Binding the envelope into the
+chain itself is proposed for 3.0.
+
 ## Where to go next
 
 - [`examples/`](../examples) has worked records for each event type, including

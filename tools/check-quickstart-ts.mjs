@@ -22,7 +22,9 @@ const DOC = join(ROOT, "docs", "quickstart-typescript.md");
 
 // The boolean lines the document tells the reader to expect, in order:
 //   parent_hash linkage, verify, verify after tampering, verify after undo.
-const EXPECTED_BOOLS = ["true", "true", "false", "true"];
+//   ...then the author is rewritten and the chain still verifies, which is the
+//   document's honest statement of what the 2.0 chain does not cover.
+const EXPECTED_BOOLS = ["true", "true", "false", "true", "true"];
 
 const blocks = [...readFileSync(DOC, "utf8").replace(/\r\n/g, "\n").matchAll(/```typescript\n(.*?)```/gs)].map((m) => m[1]);
 if (blocks.length === 0) {
